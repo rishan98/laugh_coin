@@ -21,13 +21,14 @@ class HomeViewModal with ChangeNotifier {
 
   ShowToast toast = ShowToast();
 
-  int _timeRemaining = 250; // Example: 250 seconds
   Timer? _timer;
+  Duration _timeRemaining = Duration.zero;
   bool isTimerRunning = false;
 
   double currentLgc = 0.0;
 
   bool _isBalanceLoading = false;
+  bool _isMiningLoading = false;
   String? _errorMessage;
   BalanceResponse? _balanceResponse;
   WithdrawalResponse? _withdrawalResponse;
@@ -40,6 +41,7 @@ class HomeViewModal with ChangeNotifier {
   MineResponse? _mineResponse;
 
   bool get isBalanceLoading => _isBalanceLoading;
+  bool get isMiningLoading => _isMiningLoading;
   String? get errorMessage => _errorMessage;
   BalanceResponse? get balanceResponse => _balanceResponse;
   WithdrawalResponse? get withdrawalResponse => _withdrawalResponse;
@@ -52,14 +54,21 @@ class HomeViewModal with ChangeNotifier {
   UserDetailResponse? get userDetailResponse => _userDetailResponse;
   MineResponse? get mineResponse => _mineResponse;
 
-  int get timeRemaining => _timeRemaining;
+  Duration get timeRemaining => _timeRemaining;
 
   loadingBalance(bool load) {
     _isBalanceLoading = load;
     notifyListeners();
   }
 
+  loadingMining(bool load) {
+    _isMiningLoading = load;
+    notifyListeners();
+  }
+
   getBalanceData(BuildContext context) async {
+    isTimerRunning = false;
+    _timeRemaining = Duration.zero;
     loadingBalance(true);
     String? token = Preference.getString('token');
     await _homeService.userBalance(token).then((response) async {
@@ -73,6 +82,11 @@ class HomeViewModal with ChangeNotifier {
       } else {
         if (response.data != null) {
           _balanceResponse = response.data!;
+          if (response.data!.miningSysResponse!.minedTime != null) {
+            isTimerRunning = true;
+            startCountdown(response.data!.miningSysResponse!.startedTime!);
+          }
+          notifyListeners();
         } else {
           toast.showToastError('Something went wrong');
         }
@@ -92,6 +106,12 @@ class HomeViewModal with ChangeNotifier {
     if (amount.isEmpty || address.isEmpty) {
       loadingBalance(false);
       toast.showToastError('Please enter amount and address');
+      return false;
+    }
+
+    if (int.parse(amount) < 3000) {
+      loadingBalance(false);
+      toast.showToastError('Please enter amount more than 3000');
       return false;
     }
 
@@ -305,78 +325,64 @@ class HomeViewModal with ChangeNotifier {
     });
   }
 
-  void clickStartCountDown() {
-    isTimerRunning = true;
-    double hrRate = double.tryParse(
-            _balanceResponse?.miningRateForHour?.toString() ?? '0') ??
-        0.0;
-    double lgcValue =
-        double.tryParse(_balanceResponse?.lgcBal?.toString() ?? '0') ?? 0.0;
-
-    currentLgc = lgcValue;
-
-    if (hrRate != 0) {
-      var secondValue = hrRate / 3600;
-
-      _timer?.cancel();
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        lgcValue += secondValue;
-        _balanceResponse?.lgcBal = lgcValue.toStringAsFixed(6);
-
-        notifyListeners();
-      });
-    } else {
-      toast.showToastError('Mining rate is zero, cannot start countdown.');
-    }
-  }
-
-  void clickStopCountDown() {
-    isTimerRunning = false;
-    _timer?.cancel();
-    notifyListeners();
-
-    double runningLgc =
-        double.tryParse(_balanceResponse?.lgcBal?.toString() ?? '0') ?? 0.0;
-    double lgcDiff = runningLgc - currentLgc;
-    doUserMine(lgcDiff.toStringAsFixed(6));
-
-  }
-
-  void stopCountdown() {
-    isTimerRunning = false;
-    _timer?.cancel();
-    notifyListeners();
-  }
-
-  doUserMine(String lgc) async {
+  doUserMine() async {
+    loadingMining(true);
     String? token = Preference.getString('token');
-    await _homeService.doMine(lgc, token).then((response) async {
+    await _homeService.doMine(token).then((response) async {
       if (response.error!) {
+        loadingMining(false);
         toast.showToastError(response.errorMessage!);
-        stopCountdown();
       } else {
         if (response.data != null) {
           _mineResponse = response.data!;
-          if (response.data!.appMassage == "Limit Reached") {
-            isTimerRunning = false;
-            toast.showToastError(response.data!.appMassage!);
-            stopCountdown();
-            return;
+          if (response.data!.appMassage == "started") {
+            loadingMining(false);
+            isTimerRunning = true;
+            DateTime now = DateTime.now();
+            startCountdown(now.toString());
+            notifyListeners();
           }
-
-          toast.showToastSuccess(response.data!.appMassage!);
         } else {
+          loadingMining(false);
           isTimerRunning = false;
-          stopCountdown();
           toast.showToastError('Something went wrong');
         }
       }
     }).catchError((error) {
       isTimerRunning = false;
-      stopCountdown();
+      loadingMining(false);
       toast.showToastError(error.toString());
     }).whenComplete(() {
-      // loadingBalance(false);
+      loadingMining(false);
     });
+  }
+
+  void startCountdown(String startedTimeString) {
+    DateTime startedTime = DateTime.parse(startedTimeString);
+    DateTime endTime = startedTime.add(const Duration(hours: 24));
+    DateTime now = DateTime.now();
+
+    if (now.isAfter(endTime)) {
+      // If the end time has already passed
+      isTimerRunning = false;
+      _timeRemaining = Duration.zero;
+      notifyListeners();
+    } else {
+      // Calculate the initial remaining time
+      _timeRemaining = endTime.difference(now);
+
+      // Start the timer
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (_timeRemaining.inSeconds > 0) {
+          _timeRemaining = _timeRemaining - const Duration(seconds: 1);
+          notifyListeners();
+        } else {
+          // Stop the timer when countdown is over
+          timer.cancel();
+          isTimerRunning = false;
+          notifyListeners();
+        }
+      });
+    }
   }
 }

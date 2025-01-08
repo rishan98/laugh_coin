@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:laugh_coin/utils/preference.dart';
+import 'package:laugh_coin/utils/toast.dart';
 import 'package:laugh_coin/view_models/home_view_modal.dart';
 import 'package:laugh_coin/views/buy_lgc_screen.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +16,8 @@ class BalanceScreen extends StatefulWidget {
 }
 
 class _BalanceScreenState extends State<BalanceScreen> {
+  ShowToast toast = ShowToast();
+
   @override
   void initState() {
     super.initState();
@@ -96,14 +100,14 @@ class _BalanceScreenState extends State<BalanceScreen> {
                               letterSpacing: 2),
                         ),
                         Text(
-                          '${homeViewModal.balanceResponse?.lgcBal ?? "0"} LGC',
+                          '${double.tryParse(homeViewModal.balanceResponse?.lgcBal ?? "0")?.toStringAsFixed(4) ?? "0.00"} LGC',
                           style: const TextStyle(
                               color: Color.fromARGB(255, 65, 172, 238),
                               fontSize: 30,
                               fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          'Earning rate ${homeViewModal.balanceResponse?.miningRateForHour ?? "0"} LGC/hr',
+                          'Earning rate ${homeViewModal.balanceResponse?.perDayEarn ?? "0"} LGC/hr',
                           style: const TextStyle(
                               color: Colors.white,
                               fontSize: 11,
@@ -127,7 +131,10 @@ class _BalanceScreenState extends State<BalanceScreen> {
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 Text(
-                                    homeViewModal.balanceResponse?.bnbBal ??
+                                    double.tryParse(homeViewModal
+                                                    .balanceResponse?.bnbBal ??
+                                                "0")
+                                            ?.toStringAsFixed(4) ??
                                         '-',
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -176,16 +183,37 @@ class _BalanceScreenState extends State<BalanceScreen> {
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 Text(
-                                    homeViewModal.balanceResponse?.myRefCode ??
-                                        '-',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
+                                  homeViewModal.balanceResponse?.myRefCode ??
+                                      '-',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                                 SizedBox(
                                   width: size.width * 0.05,
                                 ),
-                                const Icon(Icons.file_copy,
-                                    color: Colors.white),
+                                GestureDetector(
+                                  onTap: () {
+                                    final referralCode = homeViewModal
+                                            .balanceResponse?.myRefCode ??
+                                        '';
+                                    if (referralCode.isNotEmpty) {
+                                      Clipboard.setData(
+                                          ClipboardData(text: referralCode));
+
+                                      toast.showToastSuccess(
+                                          'Referral code copied to clipboard!');
+                                    } else {
+                                      toast.showToastError(
+                                          'No referral code available to copy.');
+                                    }
+                                  },
+                                  child: const Icon(
+                                    Icons.file_copy,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ],
                             )),
                         SizedBox(
@@ -265,7 +293,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
                               )
                             ]),
                         SizedBox(
-                          height: size.height * 0.1,
+                          height: size.height * 0.05,
                         ),
                         homeViewModal.isTimerRunning == false
                             ? Container(
@@ -281,35 +309,30 @@ class _BalanceScreenState extends State<BalanceScreen> {
                                             255, 251, 251, 252),
                                         width: 2)),
                                 child: TextButton(
-                                    onPressed: () {
-                                      homeViewModal.clickStartCountDown();
-                                    },
+                                    onPressed: homeViewModal.isMiningLoading
+                                        ? null
+                                        : () {
+                                            homeViewModal.doUserMine();
+                                          },
                                     child: const Text(
                                       'Mine',
                                       style: TextStyle(color: Colors.white),
                                     )),
                               )
-                            : Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: size.width * 0.03,
-                                    vertical: size.height * 0.03),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
-                                    color:
-                                        const Color.fromARGB(255, 169, 22, 14),
-                                    border: Border.all(
-                                        color: const Color.fromARGB(
-                                            255, 251, 251, 252),
-                                        width: 2)),
-                                child: TextButton(
-                                    onPressed: () {
-                                      homeViewModal.clickStopCountDown();
-                                    },
-                                    child: const Text(
-                                      'Stop',
-                                      style: TextStyle(color: Colors.white),
-                                    )),
-                              ),
+                            : Column(
+                                children: [
+                                  Text(
+                                    "Mining ends in ${homeViewModal.timeRemaining.inHours}h ${homeViewModal.timeRemaining.inMinutes.remainder(60)}m ${homeViewModal.timeRemaining.inSeconds.remainder(60)}s",
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  CircleAvatar(
+                                      radius: size.width * 0.15,
+                                      child: Image.network(
+                                          'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN25xejBhcXZkZm1td2xwOXkwODByMWh0YzJkc3QxcjhmMmc1dXNqOSZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/ux6vPam8BubuCxbW20/giphy.gif')),
+                                ],
+                              )
                       ],
                     ),
                   ),

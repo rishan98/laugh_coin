@@ -14,4 +14,4 @@ const userTask = "/custom-login-api/v1/dashboard/tasks/doit";
 const buyLgc = "/custom-login-api/v1/dashboard/buylgc";
 const userDetail = "/custom-login-api/v1/dashboard/profile";
 const editUserProfile = "/custom-login-api/v1/dashboard/profile_edit";
-const setMine = "/custom-login-api/v1/dashboard/mine";
+const setMine = "/custom-login-api/v1/dashboard/xyzdo";

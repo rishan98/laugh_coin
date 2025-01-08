@@ -254,6 +254,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   onPressed: () {
                     Preference.setBool('login', false);
+                    Preference.setString('token', '');
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(

@@ -296,14 +296,14 @@ class HomeService {
     });
   }
 
-  Future<APIResponse<MineResponse>> doMine(lgc, token) async {
+  Future<APIResponse<MineResponse>> doMine(token) async {
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': token,
     };
     return http
         .post(Uri.parse(baseUrl + setMine),
-            headers: headers, body: json.encode({"mined_lgc": lgc}))
+            headers: headers)
         .then((data) {
       final jasonData = json.decode(data.body);
 
