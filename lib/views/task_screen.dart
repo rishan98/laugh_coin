@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:laugh_coin/utils/toast.dart';
 import 'package:laugh_coin/view_models/home_view_modal.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TaskScreen extends StatefulWidget {
   const TaskScreen({super.key});
@@ -12,6 +14,8 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
+  ShowToast toast = ShowToast();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -77,133 +81,142 @@ class _TaskScreenState extends State<TaskScreen> {
                             child: Text('No task available',
                                 style: TextStyle(color: Colors.white)),
                           )
-                        : ListView.builder(
-                            padding: EdgeInsets.all(size.height * 0.01),
-                            itemCount:
-                                homeViewModal.taskResponse!.taskList!.length,
-                            itemBuilder: (context, index) {
-                              final item =
-                                  homeViewModal.taskResponse!.taskList![index];
-                              return Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: size.height * 0.005),
-                                child: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white70,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              item.taskDescription ?? 'N/A',
-                                              style: const TextStyle(
+                        : RefreshIndicator(
+                            onRefresh: () async {
+                              await context
+                                  .read<HomeViewModal>()
+                                  .getTaskList(context);
+                            },
+                            child: ListView.builder(
+                              padding: EdgeInsets.all(size.height * 0.01),
+                              itemCount:
+                                  homeViewModal.taskResponse!.taskList!.length,
+                              itemBuilder: (context, index) {
+                                final item = homeViewModal
+                                    .taskResponse!.taskList![index];
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: size.height * 0.005),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white70,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                item.taskDescription ?? 'N/A',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                'Reward Coin ${item.rewardCoin ?? 'N/A'}',
+                                                style: const TextStyle(
                                                   color: Colors.black,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              'Reward Coin ${item.rewardCoin ?? 'N/A'}',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: size.height * 0.01),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: TextButton(
-                                                onPressed: () {},
-                                                child: Text(
-                                                  item.taskUrl ?? 'N/A',
-                                                  style: const TextStyle(
-                                                      color: Colors.black),
-                                                )),
-                                          ),
-                                          ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.amber,
-                                              ),
-                                              onPressed: () {
-                                                showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext
-                                                                context) =>
-                                                            AlertDialog(
-                                                              title: const Text(
-                                                                  'Claim Task',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          20)),
-                                                              content:
-                                                                  const Text(
-                                                                'Are you sure you want to claim this task?',
+                                          ],
+                                        ),
+                                        SizedBox(height: size.height * 0.01),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: TextButton(
+                                                  onPressed: () {
+                                                    openURL(item.taskUrl ?? '');
+                                                  },
+                                                  child: Text(
+                                                    item.taskUrl ?? 'N/A',
+                                                    style: const TextStyle(
+                                                        color: Colors.blue),
+                                                  )),
+                                            ),
+                                            ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.amber,
+                                                ),
+                                                onPressed: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                              context) =>
+                                                          AlertDialog(
+                                                            title: const Text(
+                                                                'Claim Task',
                                                                 style: TextStyle(
                                                                     color: Colors
-                                                                        .black),
+                                                                        .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        20)),
+                                                            content: const Text(
+                                                              'Are you sure you want to claim this task?',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                            actions: [
+                                                              TextButton(
+                                                                child: const Text(
+                                                                    'Cancel'),
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
                                                               ),
-                                                              actions: [
-                                                                TextButton(
-                                                                  child: const Text(
-                                                                      'Cancel'),
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                  },
-                                                                ),
-                                                                TextButton(
-                                                                  onPressed:
-                                                                      homeViewModal
-                                                                              .isBalanceLoading
-                                                                          ? null
-                                                                          : () {
-                                                                              homeViewModal.setUserTask(context, item.id ?? '');
-                                                                            },
-                                                                  child: homeViewModal
-                                                                          .isBalanceLoading
-                                                                      ? const CircularProgressIndicator(
-                                                                          valueColor:
-                                                                              AlwaysStoppedAnimation<Color>(Colors.amber),
-                                                                        )
-                                                                      : const Text(
-                                                                          'Confirm',
-                                                                          style: TextStyle(
-                                                                              color: Colors.blue,
-                                                                              fontWeight: FontWeight.bold),
-                                                                        ),
-                                                                ),
-                                                              ],
-                                                            ));
-                                              },
-                                              child: const Text('Claim'))
-                                        ],
-                                      )
-                                    ],
+                                                              TextButton(
+                                                                onPressed:
+                                                                    homeViewModal
+                                                                            .isBalanceLoading
+                                                                        ? null
+                                                                        : () {
+                                                                            homeViewModal.setUserTask(context,
+                                                                                item.id ?? '');
+                                                                          },
+                                                                child: homeViewModal
+                                                                        .isBalanceLoading
+                                                                    ? const CircularProgressIndicator(
+                                                                        valueColor:
+                                                                            AlwaysStoppedAnimation<Color>(Colors.amber),
+                                                                      )
+                                                                    : const Text(
+                                                                        'Confirm',
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.blue,
+                                                                            fontWeight: FontWeight.bold),
+                                                                      ),
+                                                              ),
+                                                            ],
+                                                          ));
+                                                },
+                                                child: const Text('Claim'))
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
               )
             ],
@@ -237,12 +250,17 @@ class _TaskScreenState extends State<TaskScreen> {
     );
   }
 
-  // Future<void> openURL(String url) async {
-  //   final Uri uri = Uri.parse(url);
-  //   if (await canLaunchUrl(uri)) {
-  //     await launchUrl(uri);
-  //   } else {
-  //     throw 'Could not launch $url';
-  //   }
-  // }
+  Future<void> openURL(String url) async {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://$url';
+    }
+
+    final Uri uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      toast.showToastError('Could not launch $url');
+    }
+  }
 }
