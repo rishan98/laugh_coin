@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:laugh_coin/utils/preference.dart';
 import 'package:laugh_coin/view_models/login_register_view_modal.dart';
 import 'package:laugh_coin/views/edit_profile_screen.dart';
+import 'package:laugh_coin/views/kyc_screen.dart';
 import 'package:laugh_coin/views/login_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -89,7 +90,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       SizedBox(
                         width: size.width * 0.05,
                       ),
-                      Text(
+                      const Text(
                         'Edit Profile',
                         style: TextStyle(
                             color: Colors.black, fontWeight: FontWeight.bold),
@@ -102,7 +103,13 @@ class _SettingScreenState extends State<SettingScreen> {
                 height: size.height * 0.01,
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const KycScreen()),
+                  );
+                },
                 child: Container(
                   padding: EdgeInsets.symmetric(
                       horizontal: size.width * 0.02,
@@ -116,7 +123,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       SizedBox(
                         width: size.width * 0.05,
                       ),
-                      Text(
+                      const Text(
                         'KYC',
                         style: TextStyle(
                             color: Colors.black, fontWeight: FontWeight.bold),
@@ -185,7 +192,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       SizedBox(
                         width: size.width * 0.05,
                       ),
-                      Text(
+                      const Text(
                         'Delete Account',
                         style: TextStyle(
                             color: Colors.black, fontWeight: FontWeight.bold),
@@ -214,7 +221,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       SizedBox(
                         width: size.width * 0.05,
                       ),
-                      Text(
+                      const Text(
                         'Logout',
                         style: TextStyle(
                             color: Colors.black, fontWeight: FontWeight.bold),

@@ -28,14 +28,21 @@ class TaskList {
   String? id;
   String? taskDescription;
   String? taskUrl;
+  String? isDailyTask;
   String? rewardCoin;
 
-  TaskList({this.id, this.taskDescription, this.taskUrl, this.rewardCoin});
+  TaskList(
+      {this.id,
+      this.taskDescription,
+      this.taskUrl,
+      this.isDailyTask,
+      this.rewardCoin});
 
   TaskList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     taskDescription = json['task_description'];
     taskUrl = json['task_url'];
+    isDailyTask = json['is_daily_task'];
     rewardCoin = json['reward_coin'];
   }
 
@@ -44,6 +51,7 @@ class TaskList {
     data['id'] = this.id;
     data['task_description'] = this.taskDescription;
     data['task_url'] = this.taskUrl;
+    data['is_daily_task'] = this.isDailyTask;
     data['reward_coin'] = this.rewardCoin;
     return data;
   }

@@ -4,6 +4,7 @@ import 'package:laugh_coin/models/api_response.dart';
 import 'package:laugh_coin/models/balance_response.dart';
 import 'package:laugh_coin/models/deposit_history_response.dart';
 import 'package:laugh_coin/models/deposit_response.dart';
+import 'package:laugh_coin/models/deposit_view_response.dart';
 import 'package:laugh_coin/models/lgc_response.dart';
 import 'package:laugh_coin/models/mine_response.dart';
 import 'package:laugh_coin/models/task_response.dart';
@@ -11,6 +12,7 @@ import 'package:laugh_coin/models/user_detail_response.dart';
 import 'package:laugh_coin/models/user_task_response.dart';
 import 'package:laugh_coin/models/withdrawal_history_response.dart';
 import 'package:laugh_coin/models/withdrawal_response.dart';
+import 'package:laugh_coin/models/withdrawal_view_response.dart';
 import 'package:laugh_coin/utils/global.dart';
 import 'package:http/http.dart' as http;
 
@@ -302,13 +304,13 @@ class HomeService {
       'Authorization': token,
     };
     return http
-        .post(Uri.parse(baseUrl + setMine),
-            headers: headers)
+        .post(Uri.parse(baseUrl + setMine), headers: headers)
         .then((data) {
       final jasonData = json.decode(data.body);
 
       if (data.statusCode == 200) {
-        return APIResponse<MineResponse>(data: MineResponse.fromJson(jasonData));
+        return APIResponse<MineResponse>(
+            data: MineResponse.fromJson(jasonData));
       }
       if (data.statusCode == 401) {
         return APIResponse<MineResponse>(
@@ -319,6 +321,61 @@ class HomeService {
           error: true, errorMessage: 'Something went wrong');
     }).catchError((error) {
       return APIResponse<MineResponse>(
+          error: true, errorMessage: 'Something went wrong');
+    });
+  }
+
+  Future<APIResponse<WithdrawalViewResponse>> viewWithdrawalDetails(
+      token) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    };
+    return http
+        .post(Uri.parse(baseUrl + viewWithdrawal), headers: headers)
+        .then((data) {
+      final jasonData = json.decode(data.body);
+
+      if (data.statusCode == 200) {
+        return APIResponse<WithdrawalViewResponse>(
+            data: WithdrawalViewResponse.fromJson(jasonData));
+      }
+      if (data.statusCode == 401) {
+        return APIResponse<WithdrawalViewResponse>(
+            error: true, errorMessage: jasonData['message']);
+      }
+
+      return APIResponse<WithdrawalViewResponse>(
+          error: true, errorMessage: 'Something went wrong');
+    }).catchError((error) {
+      return APIResponse<WithdrawalViewResponse>(
+          error: true, errorMessage: 'Something went wrong');
+    });
+  }
+
+  Future<APIResponse<DepositViewResponse>> viewDepositDetails(token) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    };
+    return http
+        .post(Uri.parse(baseUrl + viewDeposit), headers: headers)
+        .then((data) {
+      final jasonData = json.decode(data.body);
+
+      if (data.statusCode == 200) {
+        return APIResponse<DepositViewResponse>(
+            data: DepositViewResponse.fromJson(jasonData));
+      }
+      if (data.statusCode == 401) {
+        return APIResponse<DepositViewResponse>(
+            error: true, errorMessage: jasonData['message']);
+      }
+
+      return APIResponse<DepositViewResponse>(
+          error: true, errorMessage: 'Something went wrong');
+    }).catchError((error) {
+      return APIResponse<DepositViewResponse>(
           error: true, errorMessage: 'Something went wrong');
     });
   }

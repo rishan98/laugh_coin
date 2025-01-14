@@ -61,7 +61,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     Tab(text: "Deposit"),
                   ],
                 ),
-                Expanded(
+                const Expanded(
                   child: TabBarView(
                     children: [
                       WithdrawTabView(),

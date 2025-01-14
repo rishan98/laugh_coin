@@ -7,6 +7,7 @@ import 'package:laugh_coin/view_models/home_view_modal.dart';
 import 'package:laugh_coin/views/buy_lgc_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BalanceScreen extends StatefulWidget {
   const BalanceScreen({super.key});
@@ -25,6 +26,20 @@ class _BalanceScreenState extends State<BalanceScreen> {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
       await context.read<HomeViewModal>().getBalanceData(context);
     });
+  }
+
+  Future<void> openURL(String url) async {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://$url';
+    }
+
+    final Uri uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      toast.showToastError('Could not launch $url');
+    }
   }
 
   @override
@@ -244,7 +259,11 @@ class _BalanceScreenState extends State<BalanceScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  openURL(homeViewModal
+                                          .balanceResponse!.socials!.x ??
+                                      '');
+                                },
                                 child: const CircleAvatar(
                                   radius: 20,
                                   backgroundImage:
@@ -252,7 +271,11 @@ class _BalanceScreenState extends State<BalanceScreen> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  openURL(homeViewModal
+                                          .balanceResponse!.socials!.facebook ??
+                                      '');
+                                },
                                 child: const CircleAvatar(
                                   radius: 20,
                                   backgroundImage:
@@ -260,7 +283,11 @@ class _BalanceScreenState extends State<BalanceScreen> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  openURL(homeViewModal
+                                          .balanceResponse!.socials!.insta ??
+                                      '');
+                                },
                                 child: const CircleAvatar(
                                   radius: 20,
                                   backgroundImage: AssetImage(
@@ -268,7 +295,11 @@ class _BalanceScreenState extends State<BalanceScreen> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  openURL(homeViewModal
+                                          .balanceResponse!.socials!.youtube ??
+                                      '');
+                                },
                                 child: const CircleAvatar(
                                   radius: 20,
                                   backgroundImage:
@@ -276,7 +307,11 @@ class _BalanceScreenState extends State<BalanceScreen> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  openURL(homeViewModal
+                                          .balanceResponse!.socials!.whatsapp ??
+                                      '');
+                                },
                                 child: const CircleAvatar(
                                   radius: 20,
                                   backgroundImage:
@@ -284,7 +319,11 @@ class _BalanceScreenState extends State<BalanceScreen> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  openURL(homeViewModal
+                                          .balanceResponse!.socials!.tIKTOK ??
+                                      '');
+                                },
                                 child: const CircleAvatar(
                                   radius: 20,
                                   backgroundImage: AssetImage(

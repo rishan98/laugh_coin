@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:laugh_coin/models/balance_response.dart';
 import 'package:laugh_coin/models/deposit_history_response.dart';
 import 'package:laugh_coin/models/deposit_response.dart';
+import 'package:laugh_coin/models/deposit_view_response.dart';
 import 'package:laugh_coin/models/mine_response.dart';
 import 'package:laugh_coin/models/task_response.dart';
 import 'package:laugh_coin/models/user_detail_response.dart';
 import 'package:laugh_coin/models/user_task_response.dart';
 import 'package:laugh_coin/models/withdrawal_history_response.dart';
 import 'package:laugh_coin/models/withdrawal_response.dart';
+import 'package:laugh_coin/models/withdrawal_view_response.dart';
 import 'package:laugh_coin/services/home_service.dart';
 import 'package:laugh_coin/utils/preference.dart';
 import 'package:laugh_coin/utils/toast.dart';
@@ -39,6 +41,8 @@ class HomeViewModal with ChangeNotifier {
   UserTaskResponse? _userTaskResponse;
   UserDetailResponse? _userDetailResponse;
   MineResponse? _mineResponse;
+  WithdrawalViewResponse? _withdrawalViewResponse;
+  DepositViewResponse? _depositViewResponse;
 
   bool get isBalanceLoading => _isBalanceLoading;
   bool get isMiningLoading => _isMiningLoading;
@@ -53,6 +57,8 @@ class HomeViewModal with ChangeNotifier {
   UserTaskResponse? get userTaskResponse => _userTaskResponse;
   UserDetailResponse? get userDetailResponse => _userDetailResponse;
   MineResponse? get mineResponse => _mineResponse;
+  WithdrawalViewResponse? get withdrawalViewResponse => _withdrawalViewResponse;
+  DepositViewResponse? get depositViewResponse => _depositViewResponse;
 
   Duration get timeRemaining => _timeRemaining;
 
@@ -384,5 +390,55 @@ class HomeViewModal with ChangeNotifier {
         }
       });
     }
+  }
+
+  getWithdrawalDetails(BuildContext context) async {
+    loadingBalance(true);
+    String? token = Preference.getString('token');
+    await _homeService.viewWithdrawalDetails(token).then((response) async {
+      if (response.error!) {
+        toast.showToastError(response.errorMessage!);
+        Preference.setBool('login', false);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      } else {
+        if (response.data != null) {
+          _withdrawalViewResponse = response.data!;
+        } else {
+          toast.showToastError('Something went wrong');
+        }
+      }
+    }).catchError((error) {
+      toast.showToastError(error.toString());
+    }).whenComplete(() {
+      loadingBalance(false);
+    });
+  }
+
+  getDepositDetails(BuildContext context) async {
+    loadingBalance(true);
+    String? token = Preference.getString('token');
+    await _homeService.viewDepositDetails(token).then((response) async {
+      if (response.error!) {
+        toast.showToastError(response.errorMessage!);
+        Preference.setBool('login', false);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      } else {
+        if (response.data != null) {
+          _depositViewResponse = response.data!;
+        } else {
+          toast.showToastError('Something went wrong');
+        }
+      }
+    }).catchError((error) {
+      toast.showToastError(error.toString());
+    }).whenComplete(() {
+      loadingBalance(false);
+    });
   }
 }

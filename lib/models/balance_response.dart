@@ -7,6 +7,7 @@ class BalanceResponse {
   String? perDayEarn;
   String? myRefCode;
   MiningSysResponse? miningSysResponse;
+  Socials? socials;
 
   BalanceResponse(
       {this.iD,
@@ -16,7 +17,8 @@ class BalanceResponse {
       this.bnbBal,
       this.perDayEarn,
       this.myRefCode,
-      this.miningSysResponse});
+      this.miningSysResponse,
+      this.socials});
 
   BalanceResponse.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
@@ -29,6 +31,8 @@ class BalanceResponse {
     miningSysResponse = json['mining_sys_response'] != null
         ? new MiningSysResponse.fromJson(json['mining_sys_response'])
         : null;
+    socials =
+        json['socials'] != null ? new Socials.fromJson(json['socials']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +47,9 @@ class BalanceResponse {
     if (this.miningSysResponse != null) {
       data['mining_sys_response'] = this.miningSysResponse!.toJson();
     }
+    if (this.socials != null) {
+      data['socials'] = this.socials!.toJson();
+    }
     return data;
   }
 }
@@ -52,9 +59,7 @@ class MiningSysResponse {
   String? states;
   double? mined;
   String? currentTime;
-  int? currentTimeUnix;
   String? startedTime;
-  int? startedTimeUnix;
   int? minedTime;
 
   MiningSysResponse(
@@ -62,9 +67,7 @@ class MiningSysResponse {
       this.states,
       this.mined,
       this.currentTime,
-      this.currentTimeUnix,
       this.startedTime,
-      this.startedTimeUnix,
       this.minedTime});
 
   MiningSysResponse.fromJson(Map<String, dynamic> json) {
@@ -72,9 +75,7 @@ class MiningSysResponse {
     states = json['states'];
     mined = json['mined'];
     currentTime = json['current_time'];
-    currentTimeUnix = json['current_time_unix'];
     startedTime = json['started_time'];
-    startedTimeUnix = json['started_time_unix'];
     minedTime = json['mined_time'];
   }
 
@@ -84,10 +85,45 @@ class MiningSysResponse {
     data['states'] = this.states;
     data['mined'] = this.mined;
     data['current_time'] = this.currentTime;
-    data['current_time_unix'] = this.currentTimeUnix;
     data['started_time'] = this.startedTime;
-    data['started_time_unix'] = this.startedTimeUnix;
     data['mined_time'] = this.minedTime;
+    return data;
+  }
+}
+
+class Socials {
+  String? facebook;
+  String? x;
+  String? tIKTOK;
+  String? youtube;
+  String? insta;
+  String? whatsapp;
+
+  Socials(
+      {this.facebook,
+      this.x,
+      this.tIKTOK,
+      this.youtube,
+      this.insta,
+      this.whatsapp});
+
+  Socials.fromJson(Map<String, dynamic> json) {
+    facebook = json['facebook'];
+    x = json['X'];
+    tIKTOK = json['TIKTOK'];
+    youtube = json['Youtube'];
+    insta = json['Insta'];
+    whatsapp = json['whatsapp'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['facebook'] = this.facebook;
+    data['X'] = this.x;
+    data['TIKTOK'] = this.tIKTOK;
+    data['Youtube'] = this.youtube;
+    data['Insta'] = this.insta;
+    data['whatsapp'] = this.whatsapp;
     return data;
   }
 }
