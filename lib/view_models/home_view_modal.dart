@@ -28,6 +28,7 @@ class HomeViewModal with ChangeNotifier {
   bool isTimerRunning = false;
 
   double currentLgc = 0.0;
+  Map<String, bool> claimButtonStates = {};
 
   bool _isBalanceLoading = false;
   bool _isMiningLoading = false;
@@ -440,5 +441,18 @@ class HomeViewModal with ChangeNotifier {
     }).whenComplete(() {
       loadingBalance(false);
     });
+  }
+
+  void initializeClaimButtonStates(List<TaskList> taskList) {
+    for (var task in taskList) {
+      claimButtonStates[task.id ?? ''] =
+          false;
+    }
+    notifyListeners();
+  }
+
+  void enableClaimButton(String taskId) {
+    claimButtonStates[taskId] = true; 
+    notifyListeners();
   }
 }

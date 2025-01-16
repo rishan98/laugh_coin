@@ -59,6 +59,7 @@ class _OtpScreenState extends State<OtpScreen> {
               ),
               SizedBox(height: size.height * 0.04),
               TextField(
+                controller: _otpController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(

@@ -56,7 +56,7 @@ class _DailyTaskListTabState extends State<DailyTaskListTab> {
                           .where((item) => item.isDailyTask == 'yes')
                           .toList();
                       final item = filteredTasks[index];
-
+                      final isClaimEnabled = homeViewModal.claimButtonStates[item.id ?? ''] ?? false;
                       return Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: size.height * 0.005),
@@ -101,6 +101,7 @@ class _DailyTaskListTabState extends State<DailyTaskListTab> {
                                     child: TextButton(
                                         onPressed: () {
                                           openURL.openURL(item.taskUrl ?? '');
+                                           homeViewModal.enableClaimButton(item.id ?? '');
                                         },
                                         child: Text(
                                           item.taskUrl ?? 'N/A',
@@ -112,7 +113,7 @@ class _DailyTaskListTabState extends State<DailyTaskListTab> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.amber,
                                       ),
-                                      onPressed: () {
+                                      onPressed: isClaimEnabled ? () {
                                         showDialog(
                                             context: context,
                                             builder: (BuildContext context) =>
@@ -169,7 +170,7 @@ class _DailyTaskListTabState extends State<DailyTaskListTab> {
                                                     ),
                                                   ],
                                                 ));
-                                      },
+                                      } : null,
                                       child: const Text('Claim'))
                                 ],
                               )
