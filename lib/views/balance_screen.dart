@@ -253,7 +253,17 @@ class _BalanceScreenState extends State<BalanceScreen> {
                               ],
                             )),
                         SizedBox(
-                          height: size.height * 0.04,
+                          height: size.height * 0.02,
+                        ),
+                        Text(
+                          'Share in Social Media',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: size.height * 0.02,
                         ),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,

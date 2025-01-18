@@ -88,37 +88,56 @@ class _WithdrawTabViewState extends State<WithdrawTabView> {
                         ),
                       ),
                       SizedBox(height: size.height * 0.02),
-                      GestureDetector(
-                        onTap: () {
-                          final referralCode =
-                              homeViewModel.withdrawalViewResponse!.adress ??
-                                  '';
-                          if (referralCode.isNotEmpty) {
-                            Clipboard.setData(
-                                ClipboardData(text: referralCode));
-
-                            toast.showToastSuccess(
-                                'Address copied to clipboard!');
-                          } else {
-                            toast.showToastError(
-                                'No address available to copy.');
-                          }
-                        },
-                        child: Container(
+                      Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: size.width * 0.02),
                           width: double.infinity,
-                          height: size.height * 0.05,
+                          height: size.height * 0.08,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white38,
                           ),
-                          child: const Center(
-                            child: Text('Copy Address',
-                                style: TextStyle(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Contract Address :',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      )),
+                                  Expanded(
+                                    child: Text(
+                                        '${homeViewModel.withdrawalViewResponse!.adress}',
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 10)),
+                                  )
+                                ],
+                              ),
+                              Expanded(
+                                child: IconButton(
+                                  onPressed: () {
+                                    final referralCode = homeViewModel
+                                            .withdrawalViewResponse!.adress ??
+                                        '';
+                                    if (referralCode.isNotEmpty) {
+                                      Clipboard.setData(
+                                          ClipboardData(text: referralCode));
+
+                                      toast.showToastSuccess(
+                                          'Address copied to clipboard!');
+                                    } else {
+                                      toast.showToastError(
+                                          'No address available to copy.');
+                                    }
+                                  },
+                                  icon: const Icon(Icons.copy),
                                   color: Colors.white,
-                                )),
-                          ),
-                        ),
-                      ),
+                                ),
+                              )
+                            ],
+                          )),
                       SizedBox(height: size.height * 0.01),
                       Text(
                         'Note : ${homeViewModel.withdrawalViewResponse!.text}',

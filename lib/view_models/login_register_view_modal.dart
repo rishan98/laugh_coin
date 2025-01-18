@@ -154,6 +154,9 @@ class LoginRegisterViewModel with ChangeNotifier {
       if (entry.key == "Email" && !validateEmail(entry.value)) {
         return 'Please enter a valid email address';
       }
+      if (entry.key == "Mobile" && !validatePhoneNumber(entry.value)) {
+        return 'Please enter a valid phone number';
+      }
     }
     return null;
   }
@@ -163,6 +166,13 @@ class LoginRegisterViewModel with ChangeNotifier {
       r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+',
     );
     return emailRegex.hasMatch(email);
+  }
+
+  bool validatePhoneNumber(String phoneNumber) {
+    final phoneRegex = RegExp(
+      r'^\+[1-9]\d{1,3}[1-9]\d{6,14}$',
+    );
+    return phoneRegex.hasMatch(phoneNumber);
   }
 
   getLoginToken(BuildContext context, String userName, String password) async {

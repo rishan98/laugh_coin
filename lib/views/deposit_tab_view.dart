@@ -50,6 +50,7 @@ class _DepositTabViewState extends State<DepositTabView> {
                   ))
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextField(
                         controller: _amountController,
@@ -78,36 +79,55 @@ class _DepositTabViewState extends State<DepositTabView> {
                         ),
                       ),
                       SizedBox(height: size.height * 0.02),
-                      GestureDetector(
-                        onTap: () {
-                          final referralCode =
-                              homeViewModel.depositViewResponse!.adress ?? '';
-                          if (referralCode.isNotEmpty) {
-                            Clipboard.setData(
-                                ClipboardData(text: referralCode));
-
-                            toast.showToastSuccess(
-                                'Liquidity address copied to clipboard!');
-                          } else {
-                            toast.showToastError(
-                                'No liquidity address available to copy.');
-                          }
-                        },
-                        child: Container(
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                              horizontal: size.width * 0.02),
                           width: double.infinity,
-                          height: size.height * 0.05,
+                          height: size.height * 0.08,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            color: Colors.red,
+                            color: Colors.white38,
                           ),
-                          child: const Center(
-                            child: Text('Copy Address',
-                                style: TextStyle(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Liquidity Address :',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      )),
+                                  Expanded(
+                                    child: Text(
+                                        '${homeViewModel.depositViewResponse!.adress}',
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 15)),
+                                  )
+                                ],
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    final referralCode = homeViewModel
+                                            .depositViewResponse!.adress ??
+                                        '';
+                                    if (referralCode.isNotEmpty) {
+                                      Clipboard.setData(
+                                          ClipboardData(text: referralCode));
+
+                                      toast.showToastSuccess(
+                                          'Liquidity address copied to clipboard!');
+                                    } else {
+                                      toast.showToastError(
+                                          'No liquidity address available to copy.');
+                                    }
+                                  },
+                                  icon: const Icon(Icons.copy),
                                   color: Colors.white,
-                                )),
-                          ),
-                        ),
-                      ),
+                                ),
+                              
+                            ],
+                          )),
                       SizedBox(height: size.height * 0.01),
                       Text(
                         'Note : ${homeViewModel.depositViewResponse!.text}',

@@ -5,7 +5,7 @@
 
     <application
         android:usesCleartextTraffic="true"
-        android:label="laugh_coin"
+        android:label="Laugh Coin"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
